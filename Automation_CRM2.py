@@ -154,6 +154,156 @@ class CRM2Automation:
         # )
         # save_group.click()
 
+         # Sección Inicio/Características
+
+    def create_form(
+        self,
+        form_name,
+        group_name,
+        name_rol_list,
+        option_yes_not_list,
+        max_attempts=30,
+        delay=1,
+    ):
+        """Metodo para crear formularios"""
+
+        button_forms = self.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav/div/app-left-nav/div/div/div/mat-nav-list/div/a[1]",
+                )
+            )
+        )
+
+        button_forms.click()
+
+        create_button = self.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-forms-list/div/div/div[2]/div/button",
+                )
+            )
+        )
+        create_button.click()
+
+        name_form = self.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[1]/div/div[1]/div/input",
+                )
+            )
+        )
+        name_form.send_keys(form_name)
+
+        type_form = self.driver.find_element(
+            By.XPATH,
+            "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[2]/div/div[1]/div/mat-select",
+        )
+        type_form.click()
+
+        option_type = self.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "/html/body/div[3]/div[2]/div/div/div/mat-option[3]")
+            )
+        )
+        option_type.click()
+
+        download_general = self.driver.find_element(
+            By.XPATH,
+            "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[3]/div/div[1]/div/mat-select",
+        )
+        download_general.click()
+        for name_rol in name_rol_list:
+            for i in range(4):
+                try:
+                    option = self.wait.until(
+                        EC.visibility_of_element_located(
+                            (By.XPATH, f"//mat-option[contains(., '{name_rol}')]")
+                        )
+                    )
+                    break
+                except (TimeoutException, NoSuchElementException):
+                    time.sleep(delay)
+            if option:
+                option.click()
+            else:
+                raise ValueError(f"No se puede encontrar el rol {name_rol}")
+
+        time.sleep(2)
+
+        download_general.send_keys(Keys.TAB)
+
+        campaigns = self.driver.find_element(
+            By.XPATH,
+            "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[4]/div/div[1]/div/mat-select",
+        )
+
+        campaigns.click()
+
+        select_campaigns = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH, "/html/body/div[3]/div[2]/div/div/div/mat-option[42]")
+            )
+        )
+        select_campaigns.click()
+        time.sleep(2)
+
+        group = self.driver.find_element(
+            By.XPATH,
+            "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[5]/div/div[1]",
+        )
+
+        group.click()
+
+        for attempt in range(max_attempts):
+            try:
+                group_option = self.wait.until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, f"//mat-option[contains(., '{group_name}')]")
+                    )
+                )
+                break
+            except (TimeoutException, NoSuchElementException):
+                time.sleep(delay)
+        if group_option:
+            group_option.click()
+        else:
+            raise ValueError("No se puede encontrar el grupo")
+
+        time.sleep(2)
+
+        for i, option_yes_not in enumerate(option_yes_not_list):
+
+            time_of_tipifi = self.driver.find_element(
+                By.XPATH,
+                f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[{i+6}]",
+            )
+
+            time_of_tipifi.click()
+            time.sleep(2)
+            if option_yes_not == "si":
+                option_tipifi1 = self.wait.until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.XPATH,
+                            "/html/body/div[3]/div[2]/div/div/div/mat-option[1]",
+                        )
+                    )
+                )
+                option_tipifi1.click()
+            else:
+                option_tipifi2 = self.wait.until(
+                    EC.element_to_be_clickable(
+                        (
+                            By.XPATH,
+                            "/html/body/div[3]/div[2]/div/div/div/mat-option[2]",
+                        )
+                    )
+                )
+                option_tipifi2.click()
 
 def main():
     """Metodo para ejecutar los metodos definidos"""
@@ -164,6 +314,14 @@ def main():
             r"C:\Users\USUARIO\Downloads\usuarios.xlsx", "usuarios", "A2", "A3"
         )
         Automation.create_group("Nombre Grupos", "Descripcion del grupo", users_to_add)
+
+        #Ejecución método sección Inicio/Características
+        Automation.create_form(
+                "Nombre Formulario",
+                "COS",
+                ["Administrador", "Supervisor CRM", "Asesor CRM", "BackOffice"],
+                ["si", "no"],
+            )
     except ImportError as e:
         print(f"SE PRODUJO UN ERROR EN: {e}")
 
