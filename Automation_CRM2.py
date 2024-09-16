@@ -1,6 +1,7 @@
 """Automation_CRM2"""
 
 import time
+from tkinter import Variable
 from openpyxl import load_workbook
 from selenium import webdriver
 from selenium.webdriver import ActionChains
@@ -472,8 +473,109 @@ def main():
         # Ejecución método sección Logica Integración Excel
         Automation.process_excel(r"C:\Users\USUARIO\Downloads\Campos.xlsx")
 
+    
+         # Ejecución método acción y creación
+        Automation.action_create(
+            type_camp="texto",
+            name_campo="Campo de Prueba",
+            num_colum="1",
+            list_yes_no=["si", "no"],
+            list_yes_no2=["si", "no"],
+            name_rol_see_list=["Administrador", "Supervisor CRM"],
+            name_rol_edit_list=["Asesor CRM"],
+            chacter_min="1",
+            chater_max="10",
+            place_num=1,
+        )
+
     except ImportError as e:
         print(f"SE PRODUJO UN ERROR EN: {e}")
+
+
+    #-----------------------------------------------------
+    def integrate_variables(self, variables):
+
+    """Método para integrar las variables obtenidas""" # type: ignore
+
+    for var in Variable:
+        # Aquí se adapta el código para cada tipo de integración necesario
+        # Se realizar un click en el tipo de campo correspondiente.
+        print(f"Integrando variable: {var}")
+
+def assign_field_type(self, field_name, field_type):
+    """Método para asignar tipo de campo"""
+
+    # Encuentra el campo por nombre
+    field = self.driver.find_element(By.XPATH, f"//input[@name='{field_name}']")
+    field.click()
+
+    # Encuentra y selecciona el tipo de campo
+    type_selector = self.driver.find_element(By.XPATH, "//mat-select[@placeholder='Tipo de campo']")
+    type_selector.click()
+    time.sleep(1)  # Espera a que se muestren las opciones
+
+    type_option = self.driver.find_element(By.XPATH, f"//mat-option[contains(text(), '{field_type}')]")
+    type_option.click()
+    time.sleep(1)  # Espera para que el campo se actualice
+
+
+def configure_field_variables(self, field_name, min_chars, max_chars):
+    """Método para configurar las variables de un campo"""
+
+    # Encuentra el campo por nombre
+    field = self.driver.find_element(By.XPATH, f"//input[@name='{field_name}']")
+    field.click()
+
+    # Configura el número mínimo de caracteres
+    min_input = self.driver.find_element(By.XPATH, "//input[@name='min_chars']")
+    min_input.clear()
+    min_input.send_keys(min_chars)
+
+    # Configura el número máximo de caracteres
+    max_input = self.driver.find_element(By.XPATH, "//input[@name='max_chars']")
+    max_input.clear()
+    max_input.send_keys(max_chars)
+
+
+def main():
+    """Método para ejecutar los métodos definidos"""
+
+    try:
+        # Instancia de la clase
+        Automation = CRM2Automation()
+
+        # Ejecución método sección Usuarios por Excel
+        users_to_add = Automation.read_user_from_excel(
+            r"C:\Users\USUARIO\Downloads\Campos.xlsx", "usuarios", "A2", "A3"
+        )
+
+        # Ejecución método sección Inicio/Creación
+        Automation.create_group("AXA AUTOS", "AXA AUTOS", users_to_add)
+
+        # Ejecución método sección Inicio/Características
+        Automation.create_form(
+            "Formulario Express AXA",
+            "AXA AUTOS",
+            ["Administrador", "Supervisor CRM", "Asesor CRM", "BackOffice"],
+            ["si", "no"],
+        )
+
+        # Ejecución de sección, Integración Excel
+        Automation.process_excel(r"C:\Users\USUARIO\Downloads\Campos.xlsx")
+
+        # Ejecución, Integración de Variables
+        variables = ["variable1", "variable2"]  # Debes ajustar esta lista con las variables obtenidas
+        Automation.integrate_variables(variables)
+
+        # Ejecución, Asignación de Tipo de Campo
+        Automation.assign_field_type("Campo de Prueba", "texto")
+
+        # Ejecución,  Configuración de Variables
+        Automation.configure_field_variables("Campo de Prueba", "1", "10")
+
+    except ImportError as e:
+        print(f"SE PRODUJO UN ERROR EN: {e}")
+
 
 
 if __name__ == "__main__":
