@@ -409,12 +409,90 @@ class CRM2Automation:
         print(chacter_min)
         print(chater_max)
         
-        """Parte de laura
+        nombre_campo = self.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/mat-form-field[1]/div/div[1]/div/input",
+                )
+            )
+        )
+        nombre_campo.send_keys(name_campo)
+        time.sleep(1)
+
+        numero_colum = self.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.XPATH,
+                    "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/mat-form-field[2]/div/div[1]/div/input",
+                )
+            )
+        )
+        numero_colum.clear()
+        time.sleep(3)
+        numero_colum.send_keys(num_colum)
         
-        
-        
-        
-        """
+
+        #bucle de opciones
+        for i, option_yes_not in enumerate(list_yes_no):
+            if option_yes_not == "si":
+                try:
+                    option_yes = self.driver.find_element(By.XPATH, f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[{i+1}]/section/mat-radio-group/mat-radio-button[1]")
+                    option_yes.click()
+                except(TimeoutException, NoSuchElementException):
+                    print(f"No se puede encontrar el elemento para i={i}")
+            else:
+                try:
+                    option_not = self.driver.find_element(By.XPATH, f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[{i+1}]/section/mat-radio-group/mat-radio-button[2]")
+                    option_not.click()
+                except(TimeoutException, NoSuchElementException):
+                    print(f"No se puede encontrar el elemento para i={i}")
+                
+            time.sleep(0.5)
+            print(f"i: {i}")
+            print(option_yes_not)
+
+        rol_see = self.driver.find_element(By.XPATH,"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/mat-form-field[4]/div/div[1]/div/mat-select",)
+        rol_see.click()
+        time.sleep(1)
+
+        for name_rol_see in name_rol_see_list:
+            for i in range(1):
+                try:
+                
+                    #se busca y selecciona la opcion del rol desplegable
+                    rol = self.wait.until(EC.element_to_be_clickable(((By.XPATH, f"//mat-option[contains(., '{name_rol_see}')]"))))
+                    
+                except (TimeoutException, NoSuchElementException):
+                    time.sleep(1)
+                if rol:
+                    rol.click()
+                else:
+                    raise ValueError(f"No se puede encontrar el rol {name_rol_see}")
+
+        rol_see.send_keys(Keys.TAB)
+        time.sleep(1.5)
+
+        rol_edit = self.driver.find_element(By.XPATH,"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/mat-form-field[5]/div/div[1]/div/mat-select",)
+        rol_edit.click()
+        time.sleep(1)
+
+        for name_rol_edit in name_rol_edit_list:
+            for i in range(1):
+                try:
+                
+                    #se busca y selecciona la opcion del rol desplegable
+                    rol = self.wait.until(EC.element_to_be_clickable(((By.XPATH, f"//mat-option[contains(., '{name_rol_edit}')]"))))
+                    
+                except (TimeoutException, NoSuchElementException):
+                    time.sleep(1)
+                if rol:
+                    rol.click()
+                else:
+                    raise ValueError(f"No se puede encontrar el rol {name_rol_edit}")
+
+        rol_edit.send_keys(Keys.TAB)
+        time.sleep(1.5)            
         
         # Lista de los campos especiales para el manejo de cambios
         special_types = [
