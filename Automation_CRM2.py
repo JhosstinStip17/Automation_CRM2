@@ -263,30 +263,30 @@ class CRM2Automation:
         time.sleep(2)
 
         # Elige el grupo
-        group = self.driver.find_element(
-            By.XPATH,
-            "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[5]/div/div[1]",
-        )
+        # group = self.driver.find_element(
+        #     By.XPATH,
+        #     "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[5]/div/div[1]",
+        # )
 
-        group.click()
+        # group.click()
 
         # Bucle para buscar el grupo por nombre
-        for attempt in range(max_attempts):
-            try:
-                group_option = self.wait.until(
-                    EC.element_to_be_clickable(
-                        (By.XPATH, f"//mat-option[contains(., '{group_name}')]")
-                    )
-                )
-                break
-            except (TimeoutException, NoSuchElementException):
-                time.sleep(delay)
-        if group_option:
-            group_option.click()
-        else:
-            raise ValueError("No se puede encontrar el grupo")
+        # for attempt in range(max_attempts):
+        #     try:
+        #         group_option = self.wait.until(
+        #             EC.element_to_be_clickable(
+        #                 (By.XPATH, f"//mat-option[contains(., '{group_name}')]")
+        #             )
+        #         )
+        #         break
+        #     except (TimeoutException, NoSuchElementException):
+        #         time.sleep(delay)
+        # if group_option:
+        #     group_option.click()
+        # else:
+        #     raise ValueError("No se puede encontrar el grupo")
 
-        time.sleep(2)
+        # time.sleep(2)
 
         # Bucle para seleccionar opciones si y no los dos campos siguientes
         for i, option_yes_not in enumerate(option_yes_not_list):
@@ -398,8 +398,10 @@ class CRM2Automation:
         time.sleep(1)
 
         # Imprime las variables de tiene cada campo para verificar que se esten obteniendo de manera exitosa
+
         print(name_campo)
         print(num_colum)
+
         for option in list_yes_no:
             print(option)
         for option2 in list_yes_no2:
@@ -410,6 +412,40 @@ class CRM2Automation:
             print(rol2)
         print(chacter_min)
         print(chater_max)
+
+        #aqui entran los datos que estan en el excel (creo)
+        for i, option_yes_not in enumerate(option in list_yes_no):
+            time_of_tipifi = self.driver.find_element(By.XPATH, f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[2]/mat-form-field[{i+6}]")
+            time_of_tipifi.click()
+            time.sleep(2)
+            option_xpath = "/html/body/div[3]/div[2]/div/div/div/mat-option[1]" if option_yes_not == "si" else "/html/body/div[3]/div[2]/div/div/div/mat-option[2]"
+            option = self.wait.until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+            option.click()
+
+    def action_create(self, type_camp, name_campo, num_colum, list_yes_no, list_yes_no2, name_rol_see_list, name_rol_edit_list, chacter_min, chater_max, place_num):
+        """Inicia la creación de un campo en el formulario"""
+        print("Tipo de Campo:", type_camp)
+        print("Nombre del Campo:", name_campo)
+        print("Número de Columna:", num_colum)
+
+        print("Opciones list_yes_no:")
+        for option in list_yes_no:
+            print(option)
+
+        print("Opciones list_yes_no2:")
+        for option2 in list_yes_no2:
+            print(option2)
+
+        print("Roles que pueden editar:")
+        for rol in name_rol_edit_list:
+            print(rol)
+
+        print("Roles que pueden ver:")
+        for rol2 in name_rol_see_list:
+            print(rol2)
+
+        print("Caracteres Mínimos:", chacter_min)
+        print("Caracteres Máximos:", chater_max)
 
     def process_excel(self, excel_path):
         """Metodo para procesar los datos del excel"""
@@ -456,7 +492,7 @@ def main():
 
         # Ejecución método sección Usuarios por Excel
         users_to_add = Automation.read_user_from_excel(
-            r"C:\Users\USUARIO\Downloads\Campos.xlsx", "usuarios", "A2", "A3"
+            r"C:\Users\Trabajo\Desktop\Automation_CRM2\Campos.xlsx", "usuarios", "A2", "A3"
         )
 
         # Ejecución método sección Inicio/Creación
@@ -465,15 +501,15 @@ def main():
         # Ejecución método sección Inicio/Características
         Automation.create_form(
             "Formulario Express AXA",
-            "AXA AUTOS",
+            # "ETG Global",
             ["Administrador", "Supervisor CRM", "Asesor CRM", "BackOffice"],
             ["si", "no"],
         )
 
         # Ejecución método sección Logica Integración Excel
-        Automation.process_excel(r"C:\Users\USUARIO\Downloads\Campos.xlsx")
+        Automation.process_excel(r"C:\Users\Trabajo\Desktop\Automation_CRM2\Campos.xlsx")
 
-    
+
          # Ejecución método acción y creación
         Automation.action_create(
             type_camp="texto",
@@ -487,91 +523,6 @@ def main():
             chater_max="10",
             place_num=1,
         )
-
-    except ImportError as e:
-        print(f"SE PRODUJO UN ERROR EN: {e}")
-
-
-    #-----------------------------------------------------
-    def integrate_variables(self, variables):
-
-    """Método para integrar las variables obtenidas""" # type: ignore
-
-    for var in Variable:
-        # Aquí se adapta el código para cada tipo de integración necesario
-        # Se realizar un click en el tipo de campo correspondiente.
-        print(f"Integrando variable: {var}")
-
-def assign_field_type(self, field_name, field_type):
-    """Método para asignar tipo de campo"""
-
-    # Encuentra el campo por nombre
-    field = self.driver.find_element(By.XPATH, f"//input[@name='{field_name}']")
-    field.click()
-
-    # Encuentra y selecciona el tipo de campo
-    type_selector = self.driver.find_element(By.XPATH, "//mat-select[@placeholder='Tipo de campo']")
-    type_selector.click()
-    time.sleep(1)  # Espera a que se muestren las opciones
-
-    type_option = self.driver.find_element(By.XPATH, f"//mat-option[contains(text(), '{field_type}')]")
-    type_option.click()
-    time.sleep(1)  # Espera para que el campo se actualice
-
-
-def configure_field_variables(self, field_name, min_chars, max_chars):
-    """Método para configurar las variables de un campo"""
-
-    # Encuentra el campo por nombre
-    field = self.driver.find_element(By.XPATH, f"//input[@name='{field_name}']")
-    field.click()
-
-    # Configura el número mínimo de caracteres
-    min_input = self.driver.find_element(By.XPATH, "//input[@name='min_chars']")
-    min_input.clear()
-    min_input.send_keys(min_chars)
-
-    # Configura el número máximo de caracteres
-    max_input = self.driver.find_element(By.XPATH, "//input[@name='max_chars']")
-    max_input.clear()
-    max_input.send_keys(max_chars)
-
-
-def main():
-    """Método para ejecutar los métodos definidos"""
-
-    try:
-        # Instancia de la clase
-        Automation = CRM2Automation()
-
-        # Ejecución método sección Usuarios por Excel
-        users_to_add = Automation.read_user_from_excel(
-            r"C:\Users\USUARIO\Downloads\Campos.xlsx", "usuarios", "A2", "A3"
-        )
-
-        # Ejecución método sección Inicio/Creación
-        Automation.create_group("AXA AUTOS", "AXA AUTOS", users_to_add)
-
-        # Ejecución método sección Inicio/Características
-        Automation.create_form(
-            "Formulario Express AXA",
-            "AXA AUTOS",
-            ["Administrador", "Supervisor CRM", "Asesor CRM", "BackOffice"],
-            ["si", "no"],
-        )
-
-        # Ejecución de sección, Integración Excel
-        Automation.process_excel(r"C:\Users\USUARIO\Downloads\Campos.xlsx")
-
-        # Ejecución, Integración de Variables
-        variables = ["variable1", "variable2"]  # Debes ajustar esta lista con las variables obtenidas
-        Automation.integrate_variables(variables)
-
-        # Ejecución, Asignación de Tipo de Campo
-        Automation.assign_field_type("Campo de Prueba", "texto")
-
-        # Ejecución,  Configuración de Variables
-        Automation.configure_field_variables("Campo de Prueba", "1", "10")
 
     except ImportError as e:
         print(f"SE PRODUJO UN ERROR EN: {e}")
