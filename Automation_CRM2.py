@@ -74,7 +74,7 @@ class CRM2Automation:
             EC.element_to_be_clickable(
                 (
                     By.XPATH,
-                    "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[1]",
+                    "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[1]/div/div[1]/div",
                 )
             )
         )
@@ -84,17 +84,15 @@ class CRM2Automation:
 
         # Seleciona el valor dentro del select
         select_campaign = self.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH, "/html/body/div[3]/div[4]/div/div/div/mat-option[42]")
+            EC.element_to_be_clickable(
+                (By.XPATH, "/html/body/div[2]/div[4]/div/div/div/mat-option[42]")
             )
         )
         select_campaign.click()
 
         time.sleep(3)
 
-        # Sale del select
-        out_select = self.driver.find_element(By.XPATH, "/html/body/div[3]/div[3]")
-        out_select.click()
+        select_campaign.send_keys(Keys.TAB)
 
         time.sleep(2)
 
@@ -103,7 +101,7 @@ class CRM2Automation:
             EC.visibility_of_element_located(
                 (
                     By.XPATH,
-                    "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[2]/div/div[1]/div/input",
+                    "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[2]/div/div[1]/div/input",
                 )
             )
         )
@@ -113,7 +111,7 @@ class CRM2Automation:
         # Coloca la descripcion del grupo
         descrip_group = self.driver.find_element(
             By.XPATH,
-            "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[3]/div/div[1]/div/input",
+            "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/mat-form-field[3]/div/div[1]/div/input",
         )
         time.sleep(1)
         descrip_group.send_keys(group_descrip)
@@ -123,7 +121,7 @@ class CRM2Automation:
 
             add_user = self.driver.find_element(
                 By.XPATH,
-                "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/div[4]/div[1]/mat-form-field/div/div[1]/div[1]/input",
+                "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/div[4]/div[1]/mat-form-field/div/div[1]/div[1]/input",
             )
             add_user.send_keys(user_to_add)
             add_user.send_keys(Keys.ENTER)
@@ -133,7 +131,7 @@ class CRM2Automation:
                 EC.element_to_be_clickable(
                     (
                         By.XPATH,
-                        "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/div[4]/div[2]/button",
+                        "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-content/div[4]/div[2]/button",
                     )
                 )
             )
@@ -143,7 +141,7 @@ class CRM2Automation:
 
         cancelar = self.driver.find_element(
             By.XPATH,
-            "/html/body/div[3]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-actions/button[1]",
+            "/html/body/div[2]/div[2]/div/mat-dialog-container/app-admin-groups/form/mat-dialog-actions/button[1]",
         )
 
         cancelar.click()
@@ -212,7 +210,7 @@ class CRM2Automation:
 
         option_type = self.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, "/html/body/div[3]/div[2]/div/div/div/mat-option[3]")
+                (By.XPATH, "/html/body/div[2]/div[2]/div/div/div/mat-option[3]")
             )
         )
         option_type.click()
@@ -255,7 +253,7 @@ class CRM2Automation:
 
         select_campaigns = self.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH, "/html/body/div[3]/div[2]/div/div/div/mat-option[42]")
+                (By.XPATH, "/html/body/div[2]/div[2]/div/div/div/mat-option[42]/span")
             )
         )
         select_campaigns.click()
@@ -304,7 +302,7 @@ class CRM2Automation:
                     EC.element_to_be_clickable(
                         (
                             By.XPATH,
-                            "/html/body/div[3]/div[2]/div/div/div/mat-option[1]",
+                            "/html/body/div[2]/div[2]/div/div/div/mat-option[1]/span",
                         )
                     )
                 )
@@ -314,12 +312,13 @@ class CRM2Automation:
                     EC.element_to_be_clickable(
                         (
                             By.XPATH,
-                            "/html/body/div[3]/div[2]/div/div/div/mat-option[2]",
+                            "/html/body/div[2]/div[2]/div/div/div/mat-option[2]/span",
                         )
                     )
                 )
                 option_tipifi2.click()
 
+    # Inicio de la Seccion Accion/Creacion
     def action_create(
         self,
         type_camp,
@@ -409,11 +408,90 @@ class CRM2Automation:
             print(rol2)
         print(chacter_min)
         print(chater_max)
+        
+        """Parte de laura
+        
+        
+        
+        
+        """
+        
+        # Lista de los campos especiales para el manejo de cambios
+        special_types = [
+            "desplegable",
+            "multipleseleccion",
+            "radiobutton",
+            "autocomplete",
+        ]
+        
+        # Manejo de cambios para las siguientes opciones si/no
+        if type_camp in special_types or type_camp in ("archivo", "tiempo"):
+            interval = 6
+        else:
+            interval = 7
 
+        # valor adicionador de los cambios
+        additional_offset = 0
+        # Posiciones donde se realizan los cambios 
+        special_positions = [0, 1, 5]
+
+        # Bucle para seleccionar las opciones si/no de la segunda lista
+        for q, option_y_n2 in enumerate(list_yes_no2):
+            
+            current_q = q + additional_offset
+
+            xpath_index = current_q + interval
+
+            if option_y_n2 == "si":
+                try:
+                    option_yes = self.wait.until(
+                        EC.visibility_of_element_located(
+                            (
+                                By.XPATH,
+                                f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[{xpath_index}]/section/mat-radio-group/mat-radio-button[1]",
+                            )
+                        )
+                    )
+
+                    option_yes.click()
+                    option_yes.click()
+
+                    # Manejo de cambio del index si se encuentra en las posiciones especiales
+                    if q in special_positions:
+                        additional_offset += 1
+                except (TimeoutException, NoSuchElementException):
+                    print(f"No se pudo encontrar el elemento {current_q}")
+            else:
+                try:
+                    option_no = self.wait.until(
+                        EC.visibility_of_element_located(
+                            (
+                                By.XPATH,
+                                f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[{xpath_index}]/section/mat-radio-group/mat-radio-button[2]",
+                            )
+                        )
+                    )
+
+                    option_no.click()
+                    option_no.click()
+                except (TimeoutException, NoSuchElementException):
+                    print(f"No se pudo encontrar el elemento {current_q}")
+            time.sleep(0.5)
+            # Impresiones de los index y cambios para indentificarlos
+            print(
+                f"q original: {q}, q ajustado: {current_q}, índice XPath: {xpath_index}"
+            )
+            print(option_y_n2)
+            print(f"Offset adicional actual: {additional_offset}")
+
+        time.sleep(0.5)
+    
     def process_excel(self, excel_path):
         """Metodo para procesar los datos del excel"""
 
+        # Variable que almacena el Excel
         campos_agregar = load_workbook(excel_path)
+        # Mantiene el Excel activo
         excel = campos_agregar.active
 
         # Bucle para tomar los datos las celdas
@@ -452,25 +530,28 @@ def main():
     try:
         # Instancia de la clase
         Automation = CRM2Automation()
+        
+        # Variable que contiene la ruta del archivo Excel
+        location_file = r"C:\Users\Jhosstin\Downloads\Campos.xlsx"
 
         # Ejecución método sección Usuarios por Excel
         users_to_add = Automation.read_user_from_excel(
-            r"C:\Users\USUARIO\Downloads\Campos.xlsx", "usuarios", "A2", "A3"
+            location_file, "usuarios", "A2", "A3"
         )
 
         # Ejecución método sección Inicio/Creación
-        Automation.create_group("AXA AUTOS", "AXA AUTOS", users_to_add)
+        Automation.create_group("COS", "COS", users_to_add)
 
         # Ejecución método sección Inicio/Características
         Automation.create_form(
-            "Formulario Express AXA",
-            "AXA AUTOS",
+            "Formulario",
+            "COS",
             ["Administrador", "Supervisor CRM", "Asesor CRM", "BackOffice"],
             ["si", "no"],
         )
 
         # Ejecución método sección Logica Integración Excel
-        Automation.process_excel(r"C:\Users\USUARIO\Downloads\Campos.xlsx")
+        Automation.process_excel(location_file)
 
     except ImportError as e:
         print(f"SE PRODUJO UN ERROR EN: {e}")
