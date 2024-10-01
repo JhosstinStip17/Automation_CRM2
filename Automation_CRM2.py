@@ -32,6 +32,30 @@ class CRM2Automation:
         # Variable para contar la cantidad de campos
         self.section_index = 0
 
+    # Metodo para colocar las opciones en los campos que lo requieran
+    def add_options(self, list_options):
+        """Metodo para agregar las opciones a los deplegable"""
+
+        # Bucle para colocar las opciones
+        for i, option in enumerate(list_options):
+            xpath_option = f"/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[1]/div[2]/div[{i+1 if 1 > 0 else ''}]/div[1]/mat-form-field[1]/div/div[1]/div/input"
+            try:
+                option_input = self.wait.until(
+                    EC.presence_of_element_located((By.XPATH, xpath_option))
+                )
+
+                option_input.send_keys(option)
+
+                # condicional para agregar un elemento opcion hasta que sea el ultimo
+                if i < len(list_options) - 1:
+                    button_add = self.driver.find_element(
+                        By.XPATH,
+                        "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[2]/div/div/div/div[1]/div[2]/div/div[2]/button",
+                    )
+                    button_add.click()
+            except (TimeoutException, NoSuchElementException) as e:
+                print(f"NO SE PUDO AGREGAR LA OPCION {option}. ERROR: {str(e)}")
+
     def read_user_from_excel(self, file_path, sheet_name, star_cell, end_cell):
         """Metodo para leer los usuarios de un archivo Excel"""
 
@@ -417,6 +441,7 @@ class CRM2Automation:
         chater_max,
         place_num,
         current_section,
+        list_options=None,
         name_section=None,
     ):
         """Metodo Para iniciar la creación del formulario"""
@@ -574,6 +599,10 @@ class CRM2Automation:
         ]
 
         is_special_types = type_camp.lower() in special_types
+
+        # Agrega las opciones si el campo es uno de los especiales lo cual contiene opciones
+        if is_special_types and list_options:
+            self.add_options(list_options)
 
         # Bucle para colocar las primeras caracteristicas de los campos
         for i, option_yes_not in enumerate(list_yes_no):
@@ -870,7 +899,26 @@ class CRM2Automation:
 
         # Variable con la hoja de Excel campos
         excel_camps = self.excel["campos"]
+        # Variable que contiene la hoja del Excel "opciones"
+        excel_options = self.excel["opciones"]
 
+        # Diccionario vacio de opciones
+        options_dict = {}
+        # Bucle para sacar las opciones del Excel
+        for col_index, col in enumerate(
+            excel_options.iter_cols(
+                min_col=1, max_col=excel_options.max_column, min_row=2, values_only=True
+            ),
+            start=1,
+        ):
+            # Bucle que almacena las opciones en listas
+            options = [opt for opt in col if opt]
+            if options:
+                # Agrego de las listas de opciones por index de columna
+                options_dict[col_index] = options
+        # Contador para los campos especiales que requieren opciones
+        special_types_count = 0
+        
         # Bucle para tomar los datos las celdas
         for row in excel_camps.iter_rows(min_row=2, values_only=True):
             # Varibles con las caracteristicas de los campos
@@ -890,6 +938,22 @@ class CRM2Automation:
             chater_max = str(row[18])
             new_section = row[19]
             name_section = row[20] if new_section == "si" else None
+
+            special_types = [
+                "desplegable",
+                "multipleseleccion",
+                "radiobutton",
+                "autocomplete",
+            ]
+
+            # Condicional para aumentar el contador y traer las lista de opciones por numero de contador
+            if type_camp.lower() in special_types:
+                special_types_count += 1
+                list_options = options_dict.get(special_types_count, [])
+                if not options:
+                    print(f"No se encontro opciones para el campo: {name_campo}")
+            else:
+                list_options = None
 
             # Condicional para sumar 1 al section y reiniciar el index si se crea una nueva sección
             if new_section == "si":
@@ -911,6 +975,7 @@ class CRM2Automation:
                 chater_max,
                 self.section_index,
                 self.current_section,
+                list_options,
                 name_section,
             )
 
