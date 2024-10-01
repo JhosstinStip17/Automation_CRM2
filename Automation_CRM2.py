@@ -762,6 +762,68 @@ class CRM2Automation:
             )
         )
         save_camp.click()
+        
+    # Metodo para la creacion final del formulario
+    def finally_save(self,list_camps_filters,list_camps_indentifier):
+        """Metodo para la Guardar el formulario creado"""
+        
+        # Elemento Boton crear formulario
+        botton_create_form = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[4]/button[2]")))
+        
+        botton_create_form.click()
+        
+        # Elemento desplegable de filtros 
+        select_filters = self.wait.until(EC.visibility_of_element_located((By.XPATH, "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[3]/div/div[1]/mat-form-field/div/div[1]/div/mat-select")))
+        
+        select_filters.click()
+        
+        # Bucle para selecionar los campos filtros
+        for camps in list_camps_filters:
+            for i in range(1):
+                try:
+                    filters_camp = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"//mat-option[contains(., '{camps}')]"))) 
+                except (TimeoutException, NoSuchElementException):
+                    time.sleep(1)
+            if filters_camp:
+                filters_camp.click()
+            else:
+                raise ValueError(f"NO SE PUDO ENCONTRAR EL CAMPO:{camps}")
+        
+        # Accion para salir del desplegable  
+        select_filters.send_keys(Keys.TAB)
+        
+        # Elemento boton siguiente
+        botton_next = self.wait.until(EC.visibility_of_element_located((By.XPATH, "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[3]/div/div[3]/div[2]/button")))
+        
+        # Condicional que verifica que este el boton siguiente
+        if botton_next:
+            botton_next.click()
+        else:
+            raise ValueError("NO SE PUDO ENCONTRA EL BOTON: 'SIGUIENTE'")
+        
+        # Elemento desplegable indetificador unico 
+        select_indentifier = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[2]/mat-tab-group/div/mat-tab-body[4]/div/div[1]/mat-form-field/div/div[1]/div/mat-select")))
+        
+        select_indentifier.click()
+        
+        # Bucle para selecionar los campos que sean identifiacador unico
+        for camps2 in list_camps_indentifier:
+            for i in range(1):
+                try:
+                    indentifier_camps = self.wait.until(EC.element_to_be_clickable((By.XPATH, f"//mat-option[contains(., '{camps2}')]")))
+                except (TimeoutException, NoSuchElementException):
+                    time.sleep(1)
+            if indentifier_camps:
+                
+                indentifier_camps.click()
+        
+        # Accion para salir delm desplegable 
+        select_indentifier.send_keys(Keys.TAB)
+        
+        # Elemento boton Guardar formulario
+        save_form = self.wait.until(EC.visibility_of_element_located((By.XPATH, "/html/body/app-root/app-mios/app-side-bar/div/mat-sidenav-container/mat-sidenav-content/div/app-admin-forms/div/div[1]/div[4]/button[2]")))
+        
+        save_form.click()
 
     def process_config(self, excel_path):
         """Metodo para almcenar Las primeras variables del Excel"""
@@ -784,6 +846,8 @@ class CRM2Automation:
             form_type = row[7]
             rol_donwload_list = str(row[8]).split(",") if row[8] else []
             list_y_n = [cell for cell in row[9:11] if cell in ["si", "no"]]
+            list_camps_filters = str(row[11]).split(",") if row[11] else []
+            indentifier_camps_list = str(row[12]).split(",") if row[12] else []
             # Retornamos las varibles para acceder a ellas
         return (
             campaing,
@@ -796,6 +860,8 @@ class CRM2Automation:
             form_type,
             rol_donwload_list,
             list_y_n,
+            list_camps_filters,
+            indentifier_camps_list
         )
 
     # Inicio de la Sección Integracion Excel
@@ -878,6 +944,8 @@ def main():
             form_type,
             rol_donwload_list,
             list_y_n,
+            list_camps_filters,
+            indentifier_camps_list
         ) = Automation.process_config(location_file)
 
         # Usamos las variables en los demas metodos que lo requieran
@@ -902,9 +970,9 @@ def main():
         # Ejecución método sección Logica Integración Excel y Se alamcena el resultado devuelto al terminar
         excel_processed = Automation.process_excel()
 
-        # Condicional para ejecutar otro metodo cuando el metodo process_excel termine
+        # Condicional para ejecutar el metodo finally_save cuando el metodo process_excel termine
         if excel_processed:
-            print("ESTO ES UNA PRUEBA DE PRUEBAS")
+            Automation.finally_save(list_camps_filters,indentifier_camps_list)
 
     # Manejo de los posibles errores
     except ImportError as e:
